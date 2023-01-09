@@ -70,10 +70,6 @@ resource "aws_route_table" "public-rt" {
   vpc_id = aws_vpc.vpc.id
 
   route {
-    cidr_block = var.vpccidrrange
-  }
-
-  route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.internet-gateway.id
   }
@@ -87,20 +83,31 @@ resource "aws_route_table" "private-rt" {
   vpc_id = aws_vpc.vpc.id
 
   route {
-    cidr_block = var.vpccidrrange
-  }
-
-  route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_nat_gateway.nat-gateway-one.id
   }
 
-  # route {
-  #   cidr_block = "0.0.0.0/0"
-  #   gateway_id = aws_nat_gateway.nat-gateway-two.id
-  # }
-
   tags = {
     Name = "${var.resourceprefix}-private-rt"
   }
+}
+
+resource "aws_route_table_association" "public-one" {
+  subnet_id      = aws_subnet.public-subnet-one.id
+  route_table_id = aws_route_table.public-rt.id
+}
+
+resource "aws_route_table_association" "public-two" {
+  subnet_id      = aws_subnet.public-subnet-two.id
+  route_table_id = aws_route_table.public-rt.id
+}
+
+resource "aws_route_table_association" "private-one" {
+  subnet_id      = aws_subnet.private-subnet-one.id
+  route_table_id = aws_route_table.private-rt.id
+}
+
+resource "aws_route_table_association" "private-two" {
+  subnet_id      = aws_subnet.private-subnet-two.id
+  route_table_id = aws_route_table.private-rt.id
 }
